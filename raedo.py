@@ -18,6 +18,9 @@ ydl_opts = {
         }
 
 def play_next(error):
+    global message_channel
+    global leave
+
     if not song_queue.empty():
         url = song_queue.get()
         v_client = client.voice_clients[0]
@@ -42,14 +45,19 @@ def play_next(error):
         source = discord.FFmpegPCMAudio("song.mp3")
         v_client.play(source, after=play_next)
     else:
-        print("\nBOT WILL LEAVE CURRENT VOIVE CHANNEL IN 5 MINS!\n")
-        #wait 5 mins util bot disconnects
-        time.sleep(300)
+        print("\nBOT WILL LEAVE CURRENT VOICE CHANNEL IN 5 MINS!\n")
+        #wait 2.5 mins until bot disconnects
+        leave = True
+        time.sleep(150)
+        leave_voice_channel()
+
+
+def leave_voice_channel():
+    if leave:
         v_client = client.voice_clients[0]
         msg = '[LEAVE]I\'m leaving cause yall ain\'t listening to nothing. Keep it cool my brothas!'
         asyncio.run_coroutine_threadsafe(message_channel.send(msg), client.loop)
         asyncio.run_coroutine_threadsafe(v_client.disconnect(), client.loop)
-
 
 @client.event
 async def on_ready():
@@ -60,8 +68,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    #-----------------------------------PLAY-----------------------------------------------#
     if message.content.startswith(('-play', '-p', '!play', '!p')):
         global message_channel
+        global leave
+
         message_channel = message.channel
 
         #find author's voice channel and connect to it
@@ -79,7 +90,13 @@ async def on_message(message):
             v_client = client.voice_clients[0]
 
         #get music url
+        if len(message.content.split(" ")) < 2:
+            await message.channel.send('[HELP]Not the way to ask for a song, bro. Try -p <link on youtube>. Got you!')
+            return
         url = message.content.split(" ")[1]
+
+        leave = False
+        print("\nBOT WILL NO LONGER LEAVE, IN CASE IT WERE, BECAUSE A NEW SONG CAME IN.\n")
 
         #check wether song should be played or placed in queue
         if v_client.is_playing():
@@ -105,6 +122,21 @@ async def on_message(message):
             #play the song
             source = discord.FFmpegPCMAudio("song.mp3")
             v_client.play(source, after=play_next)
+    #-----------------------------------PLAY-----------------------------------------------#
+
+    #-----------------------------------RESUME---------------------------------------------#
+    #-----------------------------------RESUME---------------------------------------------#
+
+    #-----------------------------------STOP-----------------------------------------------#
+    #-----------------------------------STOP-----------------------------------------------#
+
+    #-----------------------------------LEAVE----------------------------------------------#
+    #-----------------------------------LEAVE----------------------------------------------#
+
+    #-----------------------------------HELP-----------------------------------------------#
+    #-----------------------------------HELP-----------------------------------------------#
+
+
 
 with open('token.txt', "r") as f:
     token = f.read()
