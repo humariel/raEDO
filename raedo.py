@@ -96,6 +96,7 @@ async def on_message(message):
             source = discord.FFmpegPCMAudio("song.mp3")
             v_client.play(source, after=play_next)
 
+with open('token.txt', "r") as f:
+    token = f.read()
 
-
-client.run('ODkzNDg2OTMwMTcwMzY4MDMx.YVcKjA.KntTkTr2-JF6pQVvI_Z3fj6-KY0')
+client.run(token)
