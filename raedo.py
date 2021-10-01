@@ -22,6 +22,10 @@ def play_next(error):
         url = song_queue.get()
         v_client = client.voice_clients[0]
 
+        #in windows rewriting over previous file doesnt work. so we delete the previous file before downloading
+        if os.path.isfile("song.mp3"):
+            os.remove("song.mp3")
+
         #download song with youtube_dl
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
@@ -38,8 +42,9 @@ def play_next(error):
         source = discord.FFmpegPCMAudio("song.mp3")
         v_client.play(source, after=play_next)
     else:
-        #wait 2 mins util bot disconnects
-        time.sleep(120)
+        print("\nBOT WILL LEAVE CURRENT VOIVE CHANNEL IN 5 MINS!\n")
+        #wait 5 mins util bot disconnects
+        time.sleep(300)
         v_client = client.voice_clients[0]
         msg = '[LEAVE]I\'m leaving cause yall ain\'t listening to nothing. Keep it cool my brothas!'
         asyncio.run_coroutine_threadsafe(message_channel.send(msg), client.loop)
@@ -82,6 +87,11 @@ async def on_message(message):
             await message.channel.send('[QUEUE]Check it bruh, some other vibe playing right now, so that gonna hold on on queue for a sec. Respec be the main deal, here, on raEDO.')
         else:
             await message.channel.send('[PLAY]Hey-oh, you know how we play the hits on raEDO, so check this one out!')
+
+            #in windows rewriting over previous file doesnt work. so we delete the previous file before downloading
+            if os.path.isfile("song.mp3"):
+                os.remove("song.mp3")
+
             #download song with youtube_dl
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
